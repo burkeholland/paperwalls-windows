@@ -21,7 +21,8 @@ namespace Paperwalls;
 /// </summary>
 public partial class App : Application
 {
-    private Window? _window;
+    private MainWindow? _window;
+    private Microsoft.Windows.AppLifecycle.AppInstance? _instance;
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,9 +37,21 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        var activation = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+        _instance = Microsoft.Windows.AppLifecycle.AppInstance.FindOrRegisterForKey("Paperwalls");
+        if (!_instance.IsCurrent)
+        {
+            await _instance.RedirectActivationToAsync(activation);
+            Exit();
+            return;
+        }
+        var dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        _instance.Activated += (_, _) => dispatcher.TryEnqueue(() => _window?.ShowGallery());
         _window = new MainWindow();
         _window.Activate();
+        if (activation.Kind == Microsoft.Windows.AppLifecycle.ExtendedActivationKind.StartupTask)
+            _window.HideToTray();
     }
 }

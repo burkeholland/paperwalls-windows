@@ -32,6 +32,12 @@ public sealed partial class MainPage : Page
     private string? _currentWallpaperId;
     private bool _loading;
     private bool _suppressSettingsEvents;
+    private bool _settingWallpaper;
+    private bool _sidebarInitialized;
+
+    public event Action<string>? StatusChanged;
+
+    public void ReportStatus(string message) => SetStatus(message, persist: true);
 
     public MainPage()
     {
@@ -102,6 +108,16 @@ public sealed partial class MainPage : Page
         }
         ThemeList.ItemsSource = null;
         ThemeList.ItemsSource = _themes;
+        if (!_sidebarInitialized)
+        {
+            _sidebarInitialized = true;
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                // Initial focus must not scroll a theme button past the library.
+                SearchBox.Focus(FocusState.Programmatic);
+                SidebarScroll.ChangeView(null, 0, null, disableAnimation: true);
+            });
+        }
 
         RandomButton.IsEnabled = true;
         LoadingRing.IsActive = false;
@@ -173,6 +189,8 @@ public sealed partial class MainPage : Page
 
     private async Task SetWallpaperAsync(PaperWallpaper wallpaper)
     {
+        if (_settingWallpaper) return;
+        _settingWallpaper = true;
         Busy.IsActive = true;
         SetStatus($"Downloading {wallpaper.Name}…", persist: true);
         try
@@ -182,15 +200,18 @@ public sealed partial class MainPage : Page
             _currentWallpaperId = wallpaper.Id;
             MarkSeen(wallpaper.Id);
             SetStatus($"Set {wallpaper.Name}");
+            StatusChanged?.Invoke($"Set {wallpaper.Name}");
         }
         catch (Exception ex)
         {
             SetStatus($"Couldn't set {wallpaper.Name}", persist: true);
+            StatusChanged?.Invoke($"Couldn't set {wallpaper.Name}. Open Paperwalls and try again.");
             System.Diagnostics.Debug.WriteLine(ex);
         }
         finally
         {
             Busy.IsActive = false;
+            _settingWallpaper = false;
         }
     }
 
@@ -283,7 +304,7 @@ public sealed partial class MainPage : Page
 
     // Settings
 
-    private void OnSettingsOpening(object sender, object e)
+    private async void OnSettingsOpening(object sender, object e)
     {
         _suppressSettingsEvents = true;
         RotationToggle.IsOn = _rotation.IsEnabled;
@@ -304,6 +325,51 @@ public sealed partial class MainPage : Page
 
         CacheSizeText.Text = FormatBytes(_cache.TotalBytes());
         _suppressSettingsEvents = false;
+        await UpdateStartupAsync();
+    }
+
+    private async Task UpdateStartupAsync()
+    {
+        StartupToggle.IsEnabled = false;
+        try
+        {
+            var task = await Windows.ApplicationModel.StartupTask.GetAsync("PaperwallsStartup");
+            _suppressSettingsEvents = true;
+            StartupToggle.IsOn = task.State is Windows.ApplicationModel.StartupTaskState.Enabled
+                or Windows.ApplicationModel.StartupTaskState.EnabledByPolicy;
+            StartupToggle.IsEnabled = task.State is Windows.ApplicationModel.StartupTaskState.Enabled
+                or Windows.ApplicationModel.StartupTaskState.Disabled;
+            StartupHint.Text = task.State == Windows.ApplicationModel.StartupTaskState.DisabledByUser
+                ? "Enable Paperwalls in Windows Settings > Apps > Startup."
+                : task.State is Windows.ApplicationModel.StartupTaskState.DisabledByPolicy
+                    or Windows.ApplicationModel.StartupTaskState.EnabledByPolicy
+                    ? "Managed by your organization."
+                    : "Closing the window keeps Paperwalls in the tray.";
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
+        {
+            StartupHint.Text = "Launch at login is unavailable for this installation.";
+            System.Diagnostics.Trace.TraceError("{0}", ex);
+        }
+        finally { _suppressSettingsEvents = false; }
+    }
+
+    private async void OnStartupChanged(object sender, RoutedEventArgs e)
+    {
+        if (_suppressSettingsEvents) return;
+        StartupToggle.IsEnabled = false;
+        try
+        {
+            var task = await Windows.ApplicationModel.StartupTask.GetAsync("PaperwallsStartup");
+            if (StartupToggle.IsOn) await task.RequestEnableAsync();
+            else task.Disable();
+        }
+        catch (System.Runtime.InteropServices.COMException ex)
+        {
+            ReportStatus("Couldn't change launch at login. Check Windows Startup settings.");
+            System.Diagnostics.Trace.TraceError("{0}", ex);
+        }
+        await UpdateStartupAsync();
     }
 
     private void OnRotationChanged(object sender, RoutedEventArgs e)
@@ -350,12 +416,33 @@ public sealed partial class MainPage : Page
             _rotationTimer = DispatcherQueue.CreateTimer();
             _rotationTimer.Tick += async (_, _) =>
             {
-                if (_catalog is not null && RotationEngine.Next(_catalog, _rotation, _currentWallpaperId) is { } next)
-                    await SetWallpaperAsync(next);
+                await NextWallpaperAsync();
             };
         }
         _rotationTimer.Interval = TimeSpan.FromSeconds(RotationEngine.Normalize(_rotation.IntervalSeconds));
         _rotationTimer.Start();
+    }
+
+    public async Task NextWallpaperAsync()
+    {
+        try
+        {
+            if (_catalog is not null && RotationEngine.Next(_catalog, _rotation, _currentWallpaperId) is { } next)
+                await SetWallpaperAsync(next);
+            else
+                ReportRotationError("No wallpapers available yet. Open Paperwalls to load the catalog.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("{0}", ex);
+            ReportRotationError("Couldn't choose the next wallpaper. Open Paperwalls and refresh the catalog.");
+        }
+    }
+
+    private void ReportRotationError(string message)
+    {
+        ReportStatus(message);
+        StatusChanged?.Invoke(message);
     }
 
     private void OnClearCacheClick(object sender, RoutedEventArgs e)

@@ -12,6 +12,11 @@ namespace Paperwalls;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
+    private TrayIcon? _tray;
+    private bool _quitting;
+    private bool _explainedTray;
+    private MainPage Page => (MainPage)RootFrame.Content;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -19,7 +24,7 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
-        AppWindow.SetIcon("Assets/AppIcon.ico");
+        AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
 
         var scale = GetDpiForWindow(Microsoft.UI.Win32Interop.GetWindowFromWindowId(AppWindow.Id)) / 96.0;
         AppWindow.Resize(new Windows.Graphics.SizeInt32((int)(1320 * scale), (int)(860 * scale)));
@@ -31,6 +36,51 @@ public sealed partial class MainWindow : Window
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
+        Page.StatusChanged += message =>
+        {
+            if (!AppWindow.IsVisible) _tray?.ShowMessage(message);
+        };
+        try
+        {
+            var hwnd = Microsoft.UI.Win32Interop.GetWindowFromWindowId(AppWindow.Id);
+            _tray = new TrayIcon(hwnd, ShowGallery, async () => await Page.NextWallpaperAsync(), Quit);
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("{0}", ex);
+            Page.ReportStatus("Couldn't start the tray icon. Closing will quit Paperwalls.");
+        }
+        AppWindow.Closing += (_, args) =>
+        {
+            if (_quitting || _tray?.IsAvailable != true) return;
+            args.Cancel = true;
+            HideToTray();
+            if (!_explainedTray)
+            {
+                _tray.ShowMessage("Still running. Use the tray icon to open Paperwalls or quit.");
+                _explainedTray = true;
+            }
+        };
+        Closed += (_, _) => _tray?.Dispose();
+    }
+
+    public void ShowGallery()
+    {
+        AppWindow.Show();
+        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
+            presenter.Restore();
+        Activate();
+    }
+
+    public void HideToTray()
+    {
+        if (_tray?.IsAvailable == true) AppWindow.Hide();
+    }
+
+    private void Quit()
+    {
+        _quitting = true;
+        Close();
     }
 
     [System.Runtime.InteropServices.LibraryImport("user32.dll")]
