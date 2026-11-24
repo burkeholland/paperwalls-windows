@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Paperwalls.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Paperwalls"
+    Loaded="OnLoaded">
+
+    <Page.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <DataTemplate x:Key="SidebarItemTemplate" x:DataType="local:SidebarItem">
+            <Button
+                AutomationProperties.Name="{x:Bind Title}"
+                Background="{x:Bind Background, Mode=OneWay}"
+                Click="OnSidebarClick"
+                Style="{StaticResource SidebarButtonStyle}"
+                Tag="{x:Bind}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="{x:Bind Glyph}" Visibility="{x:Bind GlyphVisibility}" />
+                    <TextBlock
+                        FontWeight="{x:Bind Weight, Mode=OneWay}"
+                        Text="{x:Bind Title}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Button>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="248" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Sidebar  -->
+        <Grid Padding="12,4,8,0" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                AutomationProperties.Name="Search wallpapers"
+                PlaceholderText="Search"
+                QueryIcon="Find"
+                TextChanged="OnSearchChanged" />
+
+            <ScrollViewer Grid.Row="1" Padding="0,0,4,12">
+                <StackPanel>
+                    <ItemsControl x:Name="LibraryList" ItemTemplate="{StaticResource SidebarItemTemplate}" />
+                    <TextBlock
+                        Margin="12,18,0,6"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="Themes" />
+                    <ItemsControl x:Name="ThemeList" ItemTemplate="{StaticResource SidebarItemTemplate}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!--  Content  -->
+        <Grid
+            Grid.Column="1"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1,1,0,0"
+            CornerRadius="8,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Padding="28,20,20,12" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText" Style="{StaticResource SubtitleTextBlockStyle}" Text="All wallpapers" />
+                    <TextBlock
+                        x:Name="SubtitleText"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource BodyTextBlockStyle}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <ProgressRing
+                        x:Name="Busy"
+                        Width="16"
+                        Height="16"
+                        IsActive="False" />
+                    <TextBlock
+                        x:Name="StatusText"
+                        MaxWidth="360"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="4">
+                    <Button
+                        x:Name="RandomButton"
+                        AutomationProperties.Name="Set a random wallpaper"
+                        Click="OnRandomClick"
+                        IsEnabled="False"
+                        Style="{StaticResource SubtleButtonStyle}"
+                        ToolTipService.ToolTip="Random wallpaper">
+                        <FontIcon FontSize="16" Glyph="&#xE8B1;" />
+                    </Button>
+                    <Button
+                        AutomationProperties.Name="Refresh catalog"
+                        Click="OnRefreshClick"
+                        Style="{StaticResource SubtleButtonStyle}"
+                        ToolTipService.ToolTip="Refresh">
+                        <FontIcon FontSize="16" Glyph="&#xE72C;" />
+                    </Button>
+                    <Button
+                        x:Name="SettingsButton"
+                        AutomationProperties.Name="Settings"
+                        Style="{StaticResource SubtleButtonStyle}"
+                        ToolTipService.ToolTip="Settings">
+                        <FontIcon FontSize="16" Glyph="&#xE713;" />
+                        <Button.Flyout>
+                            <Flyout Opening="OnSettingsOpening" Placement="BottomEdgeAlignedRight">
+                                <StackPanel Width="300" Spacing="14">
+                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Rotation" />
+                                    <ToggleSwitch
+                                        x:Name="RotationToggle"
+                                        Header="Change wallpaper automatically"
+                                        Toggled="OnRotationChanged" />
+                                    <ComboBox
+                                        x:Name="ScopeCombo"
+                                        HorizontalAlignment="Stretch"
+                                        Header="From"
+                                        SelectionChanged="OnRotationChanged" />
+                                    <ComboBox
+                                        x:Name="IntervalCombo"
+                                        HorizontalAlignment="Stretch"
+                                        Header="Every"
+                                        SelectionChanged="OnIntervalChanged">
+                                        <ComboBoxItem Content="15 minutes" Tag="900" />
+                                        <ComboBoxItem Content="Hour" Tag="3600" />
+                                        <ComboBoxItem Content="Day" Tag="86400" />
+                                        <ComboBoxItem Content="Week" Tag="604800" />
+                                        <ComboBoxItem Content="Custom" Tag="custom" />
+                                    </ComboBox>
+                                    <NumberBox
+                                        x:Name="CustomMinutes"
+                                        Header="Minutes"
+                                        Minimum="1"
+                                        SpinButtonPlacementMode="Compact"
+                                        ValueChanged="OnCustomMinutesChanged"
+                                        Visibility="Collapsed" />
+
+                                    <MenuFlyoutSeparator />
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Downloaded wallpapers" />
+                                            <TextBlock
+                                                x:Name="CacheSizeText"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource CaptionTextBlockStyle}" />
+                                        </StackPanel>
+                                        <Button
+                                            Grid.Column="1"
+                                            Click="OnClearCacheClick"
+                                            Content="Clear" />
+                                    </Grid>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <GridView
+                x:Name="Gallery"
+                Grid.Row="1"
+                Padding="20,0,12,20"
+                IsItemClickEnabled="True"
+                ItemClick="OnWallpaperClick"
+                SelectionMode="None"
+                SizeChanged="OnGallerySizeChanged">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Padding" Value="6" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    </Style>
+                </GridView.ItemContainerStyle>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="local:WallpaperItem">
+                        <Grid AutomationProperties.Name="{x:Bind Name}" RowSpacing="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Border Background="{ThemeResource ControlAltFillColorSecondaryBrush}" CornerRadius="8">
+                                <Grid>
+                                    <Image Stretch="UniformToFill">
+                                        <Image.Source>
+                                            <BitmapImage DecodePixelType="Logical" DecodePixelWidth="400" UriSource="{x:Bind ThumbUri}" />
+                                        </Image.Source>
+                                    </Image>
+                                    <Border
+                                        Margin="8"
+                                        Padding="8,2"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                        CornerRadius="10"
+                                        Visibility="{x:Bind NewVisibility, Mode=OneWay}">
+                                        <TextBlock
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            Text="New" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <Grid Grid.Row="1" Padding="2,0,0,2" ColumnSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="{x:Bind Name}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind Tags}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <Button
+                                    Grid.Column="1"
+                                    AutomationProperties.Name="{x:Bind FavoriteLabel, Mode=OneWay}"
+                                    Click="OnFavoriteClick"
+                                    Style="{StaticResource SubtleButtonStyle}"
+                                    Tag="{x:Bind}"
+                                    ToolTipService.ToolTip="{x:Bind FavoriteLabel, Mode=OneWay}">
+                                    <FontIcon FontSize="14" Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}" />
+                                </Button>
+                                <Button
+                                    Grid.Column="2"
+                                    AutomationProperties.Name="{x:Bind SetLabel}"
+                                    Click="OnSetClick"
+                                    Content="Set"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Tag="{x:Bind}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+
+            <TextBlock
+                x:Name="EmptyText"
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="No wallpapers"
+                Visibility="Collapsed" />
+            <ProgressRing
+                x:Name="LoadingRing"
+                Grid.Row="1"
+                IsActive="True" />
+        </Grid>
+    </Grid>
+</Page>

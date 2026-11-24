@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Paperwalls (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Paperwalls (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
