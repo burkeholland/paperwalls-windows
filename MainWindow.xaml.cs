@@ -48,7 +48,7 @@ public sealed partial class MainWindow : Window
         catch (System.ComponentModel.Win32Exception ex)
         {
             System.Diagnostics.Trace.TraceError("{0}", ex);
-            Page.ReportStatus("Couldn't start the tray icon. Closing will quit Paperwalls.");
+            Page.ReportStatus("Couldn't start the tray icon. Closing will quit Paper.");
         }
         AppWindow.Closing += (_, args) =>
         {
@@ -57,7 +57,7 @@ public sealed partial class MainWindow : Window
             HideToTray();
             if (!_explainedTray)
             {
-                _tray.ShowMessage("Still running. Use the tray icon to open Paperwalls or quit.");
+                _tray.ShowMessage("Still running. Use the tray icon to open Paper or quit.");
                 _explainedTray = true;
             }
         };

@@ -1,8 +1,8 @@
-# Paperwalls for Windows
+# Paper for Windows
 
 Browse and set wallpapers from [Paper](https://burkeholland.github.io/paper/). WinUI 3 + C#, packaged as MSIX with [winapp](https://github.com/microsoft/WinAppCli).
 
-![Paperwalls](docs/screenshot.png)
+![Paper](docs/screenshot.png)
 
 ## Run
 
@@ -23,13 +23,13 @@ Installing the dev-signed bundle needs `winapp cert install devcert.pfx` (admin)
 
 ## Tray and startup
 
-Closing the window keeps Paperwalls running in the system tray, including automatic rotation. The tray menu has **Next wallpaper** (using the rotation scope), **Open**, and **Quit**. Launching the app again opens the existing window instead of starting another rotation timer.
+Closing the window keeps Paper running in the system tray, including automatic rotation. The tray menu has **Next wallpaper** (using the rotation scope), **Open**, and **Quit**. Launching the app again opens the existing window instead of starting another rotation timer.
 
 **Settings > Launch at login** is optional and off by default. Windows can disable it under **Settings > Apps > Startup**. Login launches start in the tray. Unlike the Mac menu-bar app, theme and favorite browsing stay in the Windows gallery.
 
 ## Microsoft Store checklist
 
-Reserve the app name in Partner Center, then copy its package identity values into `Package.appxmanifest`:
+Reserve the app name **Paper** in Partner Center, then copy its package identity values into `Package.appxmanifest`:
 
 | Manifest field | Value |
 |---|---|

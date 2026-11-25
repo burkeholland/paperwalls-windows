@@ -31,7 +31,7 @@ internal sealed class TrayIcon : IDisposable
         {
             DestroyIcon(_icon);
             _icon = 0;
-            throw new Win32Exception("Couldn't attach the Paperwalls tray icon.");
+            throw new Win32Exception("Couldn't attach the Paper tray icon.");
         }
         try { Add(); }
         catch
@@ -49,7 +49,7 @@ internal sealed class TrayIcon : IDisposable
         Flags = 1 | 2 | 4,
         Callback = CallbackMessage,
         Icon = _icon,
-        Tip = "Paperwalls",
+        Tip = "Paper",
         Info = "",
         InfoTitle = "",
     };
@@ -57,12 +57,12 @@ internal sealed class TrayIcon : IDisposable
     private void Add()
     {
         var data = Data();
-        if (!ShellNotifyIcon(0, ref data)) throw new Win32Exception("Couldn't add the Paperwalls tray icon.");
+        if (!ShellNotifyIcon(0, ref data)) throw new Win32Exception("Couldn't add the Paper tray icon.");
         data.Version = 4;
         if (!ShellNotifyIcon(4, ref data))
         {
             ShellNotifyIcon(2, ref data);
-            throw new Win32Exception("Couldn't configure the Paperwalls tray icon.");
+            throw new Win32Exception("Couldn't configure the Paper tray icon.");
         }
         _added = true;
     }
@@ -71,7 +71,7 @@ internal sealed class TrayIcon : IDisposable
     {
         var data = Data();
         data.Flags = 0x10;
-        data.InfoTitle = "Paperwalls";
+        data.InfoTitle = "Paper";
         data.Info = message;
         data.InfoFlags = 1;
         if (!ShellNotifyIcon(1, ref data))

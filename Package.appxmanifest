@@ -18,7 +18,7 @@
   <mp:PhoneIdentity PhoneProductId="19CB710B-9BE1-48FE-9651-180A8CB2972D" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Paperwalls</DisplayName>
+    <DisplayName>Paper</DisplayName>
     <PublisherDisplayName>AppPublisher</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
@@ -40,7 +40,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Paperwalls"
+        DisplayName="Paper"
         Description="Browse and set flat-design 4K wallpapers from Paper"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
@@ -52,7 +52,7 @@
       </uap:VisualElements>
       <Extensions>
         <desktop:Extension Category="windows.startupTask" Executable="Paperwalls.exe" EntryPoint="Windows.FullTrustApplication">
-          <desktop:StartupTask TaskId="PaperwallsStartup" Enabled="false" DisplayName="Paperwalls" />
+          <desktop:StartupTask TaskId="PaperwallsStartup" Enabled="false" DisplayName="Paper" />
         </desktop:Extension>
       </Extensions>
     </Application>

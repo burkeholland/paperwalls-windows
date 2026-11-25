@@ -205,7 +205,7 @@ public sealed partial class MainPage : Page
         catch (Exception ex)
         {
             SetStatus($"Couldn't set {wallpaper.Name}", persist: true);
-            StatusChanged?.Invoke($"Couldn't set {wallpaper.Name}. Open Paperwalls and try again.");
+            StatusChanged?.Invoke($"Couldn't set {wallpaper.Name}. Open Paper and try again.");
             System.Diagnostics.Debug.WriteLine(ex);
         }
         finally
@@ -340,11 +340,11 @@ public sealed partial class MainPage : Page
             StartupToggle.IsEnabled = task.State is Windows.ApplicationModel.StartupTaskState.Enabled
                 or Windows.ApplicationModel.StartupTaskState.Disabled;
             StartupHint.Text = task.State == Windows.ApplicationModel.StartupTaskState.DisabledByUser
-                ? "Enable Paperwalls in Windows Settings > Apps > Startup."
+                ? "Enable Paper in Windows Settings > Apps > Startup."
                 : task.State is Windows.ApplicationModel.StartupTaskState.DisabledByPolicy
                     or Windows.ApplicationModel.StartupTaskState.EnabledByPolicy
                     ? "Managed by your organization."
-                    : "Closing the window keeps Paperwalls in the tray.";
+                    : "Closing the window keeps Paper in the tray.";
         }
         catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
         {
@@ -430,12 +430,12 @@ public sealed partial class MainPage : Page
             if (_catalog is not null && RotationEngine.Next(_catalog, _rotation, _currentWallpaperId) is { } next)
                 await SetWallpaperAsync(next);
             else
-                ReportRotationError("No wallpapers available yet. Open Paperwalls to load the catalog.");
+                ReportRotationError("No wallpapers available yet. Open Paper to load the catalog.");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Trace.TraceError("{0}", ex);
-            ReportRotationError("Couldn't choose the next wallpaper. Open Paperwalls and refresh the catalog.");
+            ReportRotationError("Couldn't choose the next wallpaper. Open Paper and refresh the catalog.");
         }
     }
 
