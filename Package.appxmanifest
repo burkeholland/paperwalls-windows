@@ -11,15 +11,15 @@
   IgnorableNamespaces="uap uap10 desktop rescap systemai">
 
   <Identity
-    Name="19CB710B-9BE1-48FE-9651-180A8CB2972D"
-    Publisher="CN=AppPublisher"
+    Name="BurkeHolland.Paper-Wallpapers"
+    Publisher="CN=56DAF303-E719-4792-82B7-B59D3194B422"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="19CB710B-9BE1-48FE-9651-180A8CB2972D" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Paper</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+    <DisplayName>Paper - Wallpapers</DisplayName>
+    <PublisherDisplayName>Burke Holland</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
       <uap10:Content Enforcement="on"/>
@@ -40,7 +40,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Paper"
+        DisplayName="Paper - Wallpapers"
         Description="Browse and set flat-design 4K wallpapers from Paper"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

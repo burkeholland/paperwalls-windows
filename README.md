@@ -29,18 +29,17 @@ Closing the window keeps Paper running in the system tray, including automatic r
 
 ## Microsoft Store checklist
 
-Reserve the app name **Paper** in Partner Center, then copy its package identity values into `Package.appxmanifest`:
+The Store name **Paper - Wallpapers** is reserved in Partner Center (Store ID `9PJ4112TL8VT`; "Paper" alone was taken). `Package.appxmanifest` already carries its identity:
 
 | Manifest field | Value |
 |---|---|
-| `Identity/@Name` | Partner Center package identity name |
-| `Identity/@Publisher` | Partner Center publisher ID, including `CN=` |
-| `Properties/PublisherDisplayName` | Partner Center publisher display name |
-| `Properties/DisplayName` and `Application/uap:VisualElements/@DisplayName` | Reserved display name |
-| `desktop:StartupTask/@DisplayName` | Same display name |
-| `Identity/@Version` | Increase for each submission; keep the fourth component `0` for Store submissions |
+| `Identity/@Name` | `BurkeHolland.Paper-Wallpapers` |
+| `Identity/@Publisher` | `CN=56DAF303-E719-4792-82B7-B59D3194B422` |
+| `Properties/PublisherDisplayName` | `Burke Holland` |
+| `Properties/DisplayName` and `uap:VisualElements/@DisplayName` | `Paper - Wallpapers` (must match the reserved name) |
+| `Identity/@Version` | Increase for each submission; keep the fourth component `0` |
 
-Identity and publisher are deliberately still development placeholders. For upload, build the unsigned architecture bundle:
+The window title and tray menu still say "Paper". Build the unsigned bundle for upload:
 
 ```powershell
 winapp package .\Paperwalls.csproj --no-sign --arch arm64 --arch x64
