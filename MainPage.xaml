@@ -54,7 +54,7 @@
                 QueryIcon="Find"
                 TextChanged="OnSearchChanged" />
 
-            <ScrollViewer Grid.Row="1" Padding="0,0,4,12">
+            <ScrollViewer x:Name="SidebarScroll" Grid.Row="1" Padding="0,0,4,12" BringIntoViewOnFocusChange="False">
                 <StackPanel>
                     <ItemsControl x:Name="LibraryList" ItemTemplate="{StaticResource SidebarItemTemplate}" />
                     <TextBlock
@@ -171,6 +171,16 @@
                                         ValueChanged="OnCustomMinutesChanged"
                                         Visibility="Collapsed" />
 
+                                    <MenuFlyoutSeparator />
+                                    <ToggleSwitch
+                                        x:Name="StartupToggle"
+                                        Header="Launch at login"
+                                        Toggled="OnStartupChanged" />
+                                    <TextBlock
+                                        x:Name="StartupHint"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        TextWrapping="Wrap" />
                                     <MenuFlyoutSeparator />
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>

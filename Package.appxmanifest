@@ -5,20 +5,21 @@
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap uap10 rescap systemai">
+  IgnorableNamespaces="uap uap10 desktop rescap systemai">
 
   <Identity
-    Name="19CB710B-9BE1-48FE-9651-180A8CB2972D"
-    Publisher="CN=AppPublisher"
+    Name="BurkeHolland.Paper-Wallpapers"
+    Publisher="CN=56DAF303-E719-4792-82B7-B59D3194B422"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="19CB710B-9BE1-48FE-9651-180A8CB2972D" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Paperwalls</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+    <DisplayName>Paper - Wallpapers</DisplayName>
+    <PublisherDisplayName>Burke Holland</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
       <uap10:Content Enforcement="on"/>
@@ -39,14 +40,21 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Paperwalls"
+        DisplayName="Paper - Wallpapers"
         Description="Browse and set flat-design 4K wallpapers from Paper"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"
+                         Square71x71Logo="Assets\Square71x71Logo.png"
+                         Square310x310Logo="Assets\Square310x310Logo.png" />
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="Paperwalls.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="PaperwallsStartup" Enabled="false" DisplayName="Paper" />
+        </desktop:Extension>
+      </Extensions>
     </Application>
   </Applications>
 
